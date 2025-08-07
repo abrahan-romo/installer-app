@@ -430,54 +430,103 @@ public class UpdateChecker {
             String currentJarPath = getCurrentJarPath();
             String backupJarPath = currentJarPath + ".backup";
             
+            System.out.println("[UpdateChecker] Preparando instalación...");
+            System.out.println("[UpdateChecker] JAR actual: " + currentJarPath);
+            System.out.println("[UpdateChecker] JAR descargado: " + downloadedFile.toString());
+            System.out.println("[UpdateChecker] Backup: " + backupJarPath);
+            
             StringBuilder script = new StringBuilder();
             script.append("@echo off\n");
-            script.append("echo Instalando InstallerApp ").append(updateInfo.version).append("...\n");
+            script.append("title InstallerApp - Actualizacion a ").append(updateInfo.version).append("\n");
+            script.append("color 0A\n");
+            script.append("echo ========================================\n");
+            script.append("echo    InstallerApp - Sistema de Actualizacion\n");
+            script.append("echo ========================================\n");
+            script.append("echo.\n");
+            script.append("echo Instalando version ").append(updateInfo.version).append("...\n");
             script.append("echo.\n");
             script.append("\n");
-            script.append("REM Esperar 3 segundos para que se cierre la aplicación\n");
-            script.append("timeout /t 3 /nobreak >nul\n");
+            script.append("REM Esperar 5 segundos para que se cierre completamente la aplicación\n");
+            script.append("echo Esperando que se cierre la aplicacion...\n");
+            script.append("timeout /t 5 /nobreak\n");
+            script.append("echo.\n");
+            script.append("\n");
+            script.append("REM Verificar que el archivo actual existe\n");
+            script.append("if not exist \"").append(currentJarPath).append("\" (\n");
+            script.append("    echo ERROR: No se encontro el archivo actual en:\n");
+            script.append("    echo ").append(currentJarPath).append("\n");
+            script.append("    echo.\n");
+            script.append("    pause\n");
+            script.append("    exit /b 1\n");
+            script.append(")\n");
             script.append("\n");
             script.append("REM Crear backup de la versión actual\n");
-            script.append("copy \"").append(currentJarPath).append("\" \"").append(backupJarPath).append("\" >nul 2>&1\n");
+            script.append("echo Creando respaldo de version actual...\n");
+            script.append("copy \"").append(currentJarPath).append("\" \"").append(backupJarPath).append("\"\n");
             script.append("if errorlevel 1 (\n");
-            script.append("    echo Error: No se pudo crear backup\n");
+            script.append("    echo ERROR: No se pudo crear backup\n");
+            script.append("    echo.\n");
+            script.append("    pause\n");
+            script.append("    exit /b 1\n");
+            script.append(")\n");
+            script.append("echo Backup creado exitosamente.\n");
+            script.append("echo.\n");
+            script.append("\n");
+            script.append("REM Verificar que el archivo descargado existe\n");
+            script.append("if not exist \"").append(downloadedFile.toString()).append("\" (\n");
+            script.append("    echo ERROR: No se encontro el archivo descargado en:\n");
+            script.append("    echo ").append(downloadedFile.toString()).append("\n");
+            script.append("    echo.\n");
             script.append("    pause\n");
             script.append("    exit /b 1\n");
             script.append(")\n");
             script.append("\n");
             script.append("REM Instalar nueva versión\n");
-            script.append("copy \"").append(downloadedFile.toString()).append("\" \"").append(currentJarPath).append("\" >nul 2>&1\n");
+            script.append("echo Instalando nueva version...\n");
+            script.append("copy \"").append(downloadedFile.toString()).append("\" \"").append(currentJarPath).append("\"\n");
             script.append("if errorlevel 1 (\n");
-            script.append("    echo Error: No se pudo instalar nueva versión\n");
+            script.append("    echo ERROR: No se pudo instalar nueva version\n");
             script.append("    echo Restaurando backup...\n");
-            script.append("    copy \"").append(backupJarPath).append("\" \"").append(currentJarPath).append("\" >nul 2>&1\n");
+            script.append("    copy \"").append(backupJarPath).append("\" \"").append(currentJarPath).append("\"\n");
+            script.append("    echo.\n");
             script.append("    pause\n");
             script.append("    exit /b 1\n");
             script.append(")\n");
-            script.append("\n");
-            script.append("echo Actualización completada exitosamente!\n");
-            script.append("echo Nueva versión: ").append(updateInfo.version).append("\n");
+            script.append("echo Nueva version instalada exitosamente!\n");
             script.append("echo.\n");
-            script.append("echo Reiniciando aplicación...\n");
-            script.append("timeout /t 2 /nobreak >nul\n");
+            script.append("\n");
+            script.append("REM Limpiar backup\n");
+            script.append("del \"").append(backupJarPath).append("\" >nul 2>&1\n");
+            script.append("\n");
+            script.append("echo ========================================\n");
+            script.append("echo Actualizacion completada exitosamente!\n");
+            script.append("echo Nueva version: ").append(updateInfo.version).append("\n");
+            script.append("echo ========================================\n");
+            script.append("echo.\n");
+            script.append("echo Reiniciando aplicacion en 3 segundos...\n");
+            script.append("timeout /t 3 /nobreak\n");
             script.append("\n");
             script.append("REM Reiniciar aplicación\n");
-            script.append("start \"\" java -jar \"").append(currentJarPath).append("\"\n");
+            script.append("start \"InstallerApp\" java -jar \"").append(currentJarPath).append("\"\n");
             script.append("\n");
             script.append("REM Limpiar archivos temporales\n");
+            script.append("echo Limpiando archivos temporales...\n");
             script.append("del \"").append(downloadedFile.toString()).append("\" >nul 2>&1\n");
+            script.append("timeout /t 2 /nobreak >nul\n");
             script.append("del \"").append(scriptPath.toString()).append("\" >nul 2>&1\n");
             script.append("\n");
+            script.append("echo Proceso completado. Cerrando...\n");
             script.append("exit\n");
             
             Files.write(scriptPath, script.toString().getBytes());
             
             System.out.println("[UpdateChecker] Script de instalación creado: " + scriptPath);
+            System.out.println("[UpdateChecker] Script listo para ejecutar.");
             return true;
             
         } catch (Exception e) {
             System.err.println("[UpdateChecker] Error preparando instalación: " + e.getMessage());
+            e.printStackTrace();
             return false;
         }
     }
@@ -489,16 +538,44 @@ public class UpdateChecker {
         try {
             // Intentar obtener el path del JAR actual
             String jarPath = UpdateChecker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+            
+            // Decodificar URL encoding si existe
+            jarPath = java.net.URLDecoder.decode(jarPath, "UTF-8");
+            
+            // En Windows, remover el primer "/" si existe
+            if (System.getProperty("os.name").toLowerCase().contains("windows") && jarPath.startsWith("/")) {
+                jarPath = jarPath.substring(1);
+            }
+            
+            // Convertir separadores a Windows si es necesario
+            jarPath = jarPath.replace("/", "\\");
+            
+            System.out.println("[UpdateChecker] JAR Path detectado: " + jarPath);
+            
             if (jarPath.endsWith(".jar")) {
                 return jarPath;
             }
             
-            // Fallback: asumir instalación estándar en TGCS
-            return "C:\\Program Files\\InstallerApp\\TGCS\\InstallerApp-" + CURRENT_VERSION + ".jar";
+            // Fallback: buscar en el directorio actual
+            File currentDir = new File(System.getProperty("user.dir"));
+            File[] jarFiles = currentDir.listFiles((dir, name) -> name.startsWith("InstallerApp") && name.endsWith(".jar"));
+            
+            if (jarFiles != null && jarFiles.length > 0) {
+                String detectedPath = jarFiles[0].getAbsolutePath();
+                System.out.println("[UpdateChecker] JAR encontrado en directorio actual: " + detectedPath);
+                return detectedPath;
+            }
+            
+            // Segundo fallback: asumir instalación estándar en TGCS
+            String standardPath = "C:\\Program Files\\InstallerApp\\TGCS\\InstallerApp-" + CURRENT_VERSION + ".jar";
+            System.out.println("[UpdateChecker] Usando path estándar: " + standardPath);
+            return standardPath;
             
         } catch (Exception e) {
             System.err.println("[UpdateChecker] Error obteniendo JAR path: " + e.getMessage());
-            return "C:\\Program Files\\InstallerApp\\TGCS\\InstallerApp-" + CURRENT_VERSION + ".jar";
+            String fallbackPath = "C:\\Program Files\\InstallerApp\\TGCS\\InstallerApp-" + CURRENT_VERSION + ".jar";
+            System.out.println("[UpdateChecker] Usando path de respaldo: " + fallbackPath);
+            return fallbackPath;
         }
     }
     
@@ -530,14 +607,23 @@ public class UpdateChecker {
         
         switch (choice) {
             case 0: // Instalar Ahora
+                System.out.println("[UpdateChecker] Usuario seleccionó: Instalar Ahora");
                 executeInstallation();
                 break;
             case 1: // Instalar Al Cerrar
+                System.out.println("[UpdateChecker] Usuario seleccionó: Instalar Al Cerrar");
                 System.out.println("[UpdateChecker] Instalación programada para el cierre de la aplicación");
                 // TODO: Programar instalación para shutdown hook
                 break;
             case 2: // Cancelar
+                System.out.println("[UpdateChecker] Usuario seleccionó: Cancelar");
                 System.out.println("[UpdateChecker] Instalación cancelada por el usuario");
+                // Limpiar archivos temporales
+                cleanupTempFiles();
+                break;
+            default:
+                System.out.println("[UpdateChecker] Dialog cerrado sin selección");
+                cleanupTempFiles();
                 break;
         }
     }
@@ -555,10 +641,21 @@ public class UpdateChecker {
             }
             
             System.out.println("[UpdateChecker] Ejecutando instalación...");
+            System.out.println("[UpdateChecker] Script ubicado en: " + scriptPath.toString());
             
-            // Ejecutar script de instalación
-            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", scriptPath.toString());
-            pb.start();
+            // Ejecutar script de instalación con ventana visible
+            ProcessBuilder pb = new ProcessBuilder("cmd", "/c", "start", "cmd", "/k", scriptPath.toString());
+            pb.directory(new File(TEMP_UPDATE_DIR));
+            
+            System.out.println("[UpdateChecker] Comando a ejecutar: " + String.join(" ", pb.command()));
+            
+            Process process = pb.start();
+            
+            System.out.println("[UpdateChecker] Proceso de instalación iniciado.");
+            System.out.println("[UpdateChecker] La aplicación se cerrará en 2 segundos...");
+            
+            // Esperar un poco antes de cerrar para dar tiempo al script
+            Thread.sleep(2000);
             
             // Cerrar aplicación
             System.out.println("[UpdateChecker] Cerrando aplicación para instalación...");
@@ -566,7 +663,29 @@ public class UpdateChecker {
             
         } catch (Exception e) {
             System.err.println("[UpdateChecker] Error ejecutando instalación: " + e.getMessage());
+            e.printStackTrace();
             showErrorDialog("Error iniciando instalación: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Limpiar archivos temporales de actualización
+     */
+    private void cleanupTempFiles() {
+        try {
+            Path tempDir = Paths.get(TEMP_UPDATE_DIR);
+            if (Files.exists(tempDir)) {
+                Files.list(tempDir).forEach(file -> {
+                    try {
+                        Files.delete(file);
+                        System.out.println("[UpdateChecker] Archivo temporal eliminado: " + file);
+                    } catch (IOException e) {
+                        System.err.println("[UpdateChecker] No se pudo eliminar: " + file + " - " + e.getMessage());
+                    }
+                });
+            }
+        } catch (Exception e) {
+            System.err.println("[UpdateChecker] Error limpiando archivos temporales: " + e.getMessage());
         }
     }
     
