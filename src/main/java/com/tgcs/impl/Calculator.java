@@ -35,4 +35,19 @@ public class Calculator {
         return a * b;
     }
     
+    /**
+     * Calculates the division of two integers.
+     *
+     * @param a the dividend (first integer)
+     * @param b the divisor (second integer)
+     * @return the result of dividing a by b
+     * @throws ArithmeticException if b is zero
+     */
+    public int division(int a, int b) {
+        if (b == 0) {
+            throw new ArithmeticException("Cannot divide by zero");
+        }
+        return a / b;
+    }
+    
 }
