@@ -28,7 +28,7 @@ public class UpdateChecker {
     // Configuración del sistema de updates
     private static final String GITHUB_API_URL = "https://api.github.com/repos/abrahan-romo/installer-app/releases/latest";
     private static final String USER_AGENT = "InstallerApp-Updater/1.0";
-private static final String CURRENT_VERSION = "1.0.3";
+    private static final String CURRENT_VERSION = "1.0.3-v7"; // Updated to match current version
     private static final int CONNECTION_TIMEOUT_MS = 10000;
     private static final int READ_TIMEOUT_MS = 30000;
     private static final long CHECK_INTERVAL_HOURS = 24;
@@ -240,7 +240,7 @@ private static final String CURRENT_VERSION = "1.0.3";
     
     /**
      * Comparar si newVersion es mayor que currentVersion
-     * Implementación simple que asume formato x.y.z
+     * Implementación mejorada que maneja formato x.y.z-vN
      */
     private boolean isNewerVersion(String newVersion, String currentVersion) {
         if (newVersion == null || currentVersion == null) return false;
@@ -249,20 +249,35 @@ private static final String CURRENT_VERSION = "1.0.3";
         newVersion = newVersion.startsWith("v") ? newVersion.substring(1) : newVersion;
         currentVersion = currentVersion.startsWith("v") ? currentVersion.substring(1) : currentVersion;
         
-        String[] newParts = newVersion.split("\\.");
-        String[] currentParts = currentVersion.split("\\.");
+        // Separar versión base y sufijo
+        String[] newParts = newVersion.split("-");
+        String[] currentParts = currentVersion.split("-");
         
-        int maxLength = Math.max(newParts.length, currentParts.length);
+        // Comparar versión base (x.y.z)
+        String[] newNums = newParts[0].split("\\.");
+        String[] currentNums = currentParts[0].split("\\.");
+        
+        int maxLength = Math.max(newNums.length, currentNums.length);
         
         for (int i = 0; i < maxLength; i++) {
-            int newPart = i < newParts.length ? Integer.parseInt(newParts[i]) : 0;
-            int currentPart = i < currentParts.length ? Integer.parseInt(currentParts[i]) : 0;
+            int newNum = i < newNums.length ? Integer.parseInt(newNums[i]) : 0;
+            int currentNum = i < currentNums.length ? Integer.parseInt(currentNums[i]) : 0;
             
-            if (newPart > currentPart) return true;
-            if (newPart < currentPart) return false;
+            if (newNum > currentNum) return true;
+            if (newNum < currentNum) return false;
         }
         
-        return false; // Versiones iguales
+        // Si las versiones base son iguales, comparar sufijos si existen
+        if (newParts.length > 1 && currentParts.length > 1) {
+            // Extraer números de sufijos (v7 -> 7)
+            int newSuffix = Integer.parseInt(newParts[1].substring(1));
+            int currentSuffix = Integer.parseInt(currentParts[1].substring(1));
+            return newSuffix > currentSuffix;
+        }
+        
+        // Si una tiene sufijo y la otra no, la que tiene sufijo es más nueva
+        return newParts.length > currentParts.length;
+    }
     }
     
     /**
@@ -437,6 +452,11 @@ private static final String CURRENT_VERSION = "1.0.3";
             
             StringBuilder script = new StringBuilder();
             script.append("@echo off\n");
+            // Request admin privileges using PowerShell
+            script.append("powershell -Command \"Start-Process -FilePath '%~f0' -Verb RunAs -ArgumentList 'ELEVATED' & exit\"\n");
+            script.append("if '%1'=='ELEVATED' goto :continue\n");
+            script.append("exit /b\n\n");
+            script.append(":continue\n");
             script.append("title InstallerApp - Actualizacion a ").append(updateInfo.version).append("\n");
             script.append("color 0A\n");
             script.append("echo ========================================\n");
@@ -446,9 +466,13 @@ private static final String CURRENT_VERSION = "1.0.3";
             script.append("echo Instalando version ").append(updateInfo.version).append("...\n");
             script.append("echo.\n");
             script.append("\n");
-            script.append("REM Esperar 5 segundos para que se cierre completamente la aplicación\n");
+            script.append("REM Esperar 10 segundos para que se cierre completamente la aplicación\n");
             script.append("echo Esperando que se cierre la aplicacion...\n");
-            script.append("timeout /t 5 /nobreak\n");
+            script.append("timeout /t 10 /nobreak\n");
+            
+            // Kill any remaining Java processes that might be using our JAR
+            script.append("echo Asegurando que la aplicacion este cerrada...\n");
+            script.append("taskkill /F /IM java.exe /FI \"WINDOWTITLE eq InstallerApp*\" >nul 2>&1\n");
             script.append("echo.\n");
             script.append("\n");
             script.append("REM Verificar que el archivo actual existe\n");
@@ -481,13 +505,38 @@ private static final String CURRENT_VERSION = "1.0.3";
             script.append("    exit /b 1\n");
             script.append(")\n");
             script.append("\n");
+            script.append("REM Verificar si el archivo destino existe y eliminarlo\n");
+            script.append("echo Preparando instalacion de nueva version...\n");
+            script.append("if exist \"").append(currentJarPath).append("\" (\n");
+            script.append("    del /F /Q \"").append(currentJarPath).append("\"\n");
+            script.append("    if errorlevel 1 (\n");
+            script.append("        echo ERROR: No se pudo eliminar la version anterior\n");
+            script.append("        echo Es posible que necesite permisos de administrador\n");
+            script.append("        echo.\n");
+            script.append("        pause\n");
+            script.append("        exit /b 1\n");
+            script.append("    )\n");
+            script.append(")\n\n");
+            
             script.append("REM Instalar nueva versión\n");
             script.append("echo Instalando nueva version...\n");
-            script.append("copy \"").append(downloadedFile.toString()).append("\" \"").append(currentJarPath).append("\"\n");
+            script.append("copy /B /Y \"").append(downloadedFile.toString()).append("\" \"").append(currentJarPath).append("\"\n");
             script.append("if errorlevel 1 (\n");
             script.append("    echo ERROR: No se pudo instalar nueva version\n");
             script.append("    echo Restaurando backup...\n");
-            script.append("    copy \"").append(backupJarPath).append("\" \"").append(currentJarPath).append("\"\n");
+            script.append("    copy /B /Y \"").append(backupJarPath).append("\" \"").append(currentJarPath).append("\"\n");
+            script.append("    echo.\n");
+            script.append("    pause\n");
+            script.append("    exit /b 1\n");
+            script.append(")\n\n");
+            
+            script.append("REM Verificar integridad del archivo copiado\n");
+            script.append("echo Verificando instalacion...\n");
+            script.append("fc /b \"").append(downloadedFile.toString()).append("\" \"").append(currentJarPath).append("\" >nul\n");
+            script.append("if errorlevel 1 (\n");
+            script.append("    echo ERROR: La verificacion de archivos fallo\n");
+            script.append("    echo Restaurando backup...\n");
+            script.append("    copy /B /Y \"").append(backupJarPath).append("\" \"").append(currentJarPath).append("\"\n");
             script.append("    echo.\n");
             script.append("    pause\n");
             script.append("    exit /b 1\n");
