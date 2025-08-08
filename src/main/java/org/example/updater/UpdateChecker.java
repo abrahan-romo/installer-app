@@ -28,7 +28,7 @@ public class UpdateChecker {
     // Configuración del sistema de updates
     private static final String GITHUB_API_URL = "https://api.github.com/repos/abrahan-romo/installer-app/releases/latest";
     private static final String USER_AGENT = "InstallerApp-Updater/1.0";
-    private static final String CURRENT_VERSION = "1.0.3-v7"; // Updated to match current version
+    private static final String CURRENT_VERSION = "1.0.4-v8"; // Updated to match current version
     private static final int CONNECTION_TIMEOUT_MS = 10000;
     private static final int READ_TIMEOUT_MS = 30000;
     private static final long CHECK_INTERVAL_HOURS = 24;
@@ -278,8 +278,6 @@ public class UpdateChecker {
         // Si una tiene sufijo y la otra no, la que tiene sufijo es más nueva
         return newParts.length > currentParts.length;
     }
-    }
-    
     /**
      * Mostrar notificación de actualización disponible
      */

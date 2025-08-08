@@ -1,11 +1,11 @@
-# Crear Instalador v1.0.3-v7 - NUEVA VERSION CON METODO MULTIPLICACION
-Write-Host "=== Creador de Instalador InstallerApp v1.0.3-v7 ===" -ForegroundColor Green
+# Crear Instalador v1.0.4-v8 - NUEVA VERSION CON METODO DIVISION
+Write-Host "=== Creador de Instalador InstallerApp v1.0.4-v8 ===" -ForegroundColor Green
 Write-Host "URL de GitHub actualizada: abrahan-romo/installer-app" -ForegroundColor Yellow
 
 # Variables
-$version = "1.0.3-v7"
+$version = "1.0.4-v8"
 $installerDir = "target\installer-v$version-TGCS"
-$jarFile = "target\InstallerApp-1.0.3.jar"
+$jarFile = "target\InstallerApp-$version.jar"
 $zipFile = "target\InstallerApp-$version-Windows-Installer-TGCS.zip"
 
 Write-Host "[DEBUG] Variables inicializadas:"
@@ -36,8 +36,8 @@ if ($dirResult -eq $null -or -not (Test-Path $installerDir)) {
 
 Write-Host "[2/4] Copiando archivos..." -ForegroundColor Cyan
 try {
-    Copy-Item $jarFile "$installerDir\InstallerApp-1.0.3.jar" -ErrorAction Stop
-    Write-Host "[DEBUG] Copiado: $jarFile -> $installerDir\InstallerApp-1.0.3.jar"
+    Copy-Item $jarFile "$installerDir\InstallerApp-$version.jar" -ErrorAction Stop
+    Write-Host "[DEBUG] Copiado: $jarFile -> $installerDir\InstallerApp-$version.jar"
     Copy-Item "installer-resources\run-app.bat" "$installerDir\" -ErrorAction Stop
     Write-Host "[DEBUG] Copiado: run-app.bat"
     Copy-Item "installer-resources\desinstalar.bat" "$installerDir\" -ErrorAction Stop
@@ -70,7 +70,7 @@ if %errorLevel% neq 0 (
 )
 
 echo ======================================================
-echo   InstallerApp v1.0.3-v7 - Instalador FINAL
+echo   InstallerApp v1.0.4-v8 - Instalador FINAL
 echo   URL GitHub: abrahan-romo/installer-app
 echo   Instalacion en: C:\Program Files\InstallerApp\TGCS
 echo ======================================================
@@ -94,18 +94,18 @@ set "SCRIPT_DIR=%~dp0"
 
 REM Copiar archivos con verificacion y ruta absoluta
 echo Copiando archivos...
-if not exist "%SCRIPT_DIR%InstallerApp-1.0.3.jar" (
-    echo ERROR: No se encontro InstallerApp-1.0.3.jar en %SCRIPT_DIR%
+if not exist "%SCRIPT_DIR%InstallerApp-$version.jar" (
+    echo ERROR: No se encontro InstallerApp-$version.jar en %SCRIPT_DIR%
     echo Archivos disponibles:
     dir "%SCRIPT_DIR%*.jar" 2>nul
     pause
     exit /b 1
 )
 
-copy "%SCRIPT_DIR%InstallerApp-1.0.3.jar" "%INSTALL_DIR%\" >nul 2>&1
+copy "%SCRIPT_DIR%InstallerApp-$version.jar" "%INSTALL_DIR%\" >nul 2>&1
 if errorlevel 1 (
-    echo ERROR: No se pudo copiar InstallerApp-1.0.3.jar
-    echo Origen: %SCRIPT_DIR%InstallerApp-1.0.3.jar
+    echo ERROR: No se pudo copiar InstallerApp-$version.jar
+    echo Origen: %SCRIPT_DIR%InstallerApp-$version.jar
     echo Destino: %INSTALL_DIR%\
     pause
     exit /b 1
@@ -128,22 +128,23 @@ echo Ubicacion: %INSTALL_DIR%
 echo URL del repositorio: https://github.com/abrahan-romo/installer-app
 echo Sistema de actualizaciones: CONFIGURADO
 echo.
-echo Para ejecutar: java -jar "%INSTALL_DIR%\InstallerApp-1.0.3.jar"
+echo Para ejecutar: java -jar "%INSTALL_DIR%\InstallerApp-$version.jar"
 echo.
 pause
 "@
 $installerBat | Out-File -FilePath "$installerDir\instalar.bat" -Encoding ASCII
 
 $leeme = @"
-InstallerApp v1.0.3-v7 - NUEVA VERSION CON METODO MULTIPLICACION
+InstallerApp v1.0.4-v8 - NUEVA VERSION CON METODO DIVISION
 ===============================================================
-- NUEVO: Metodo multiplicacion() agregado a Calculator.java
-- Operacion de multiplicacion (a * b) implementada
-- Metodo resta() y suma() disponibles
-- URL de GitHub corregida: abrahan-romo/installer-app
+- NUEVO: Metodo division() agregado a Calculator.java
+- Operacion de division (a / b) implementada
+- Metodos suma(), resta() y multiplicacion() disponibles
+- URL de GitHub: abrahan-romo/installer-app
 - Sistema de actualizaciones automaticas FUNCIONAL
 - Compatible con directorio TGCS
 - Desinstalador completo incluido
+- Version del instalador: v8
 "@
 $leeme | Out-File -FilePath "$installerDir\LEEME.txt" -Encoding UTF8
 
