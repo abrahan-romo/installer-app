@@ -23,5 +23,16 @@ public class Calculator {
     public int resta(int a, int b) {
         return a - b;
     }
+
+    /**
+     * Calculates the multiplication of two integers.
+     *
+     * @param a the first integer
+     * @param b the second integer
+     * @return the multiplication of a and b
+     */
+    public int multiplicacion(int a, int b) {
+        return a * b;
+    }
     
 }

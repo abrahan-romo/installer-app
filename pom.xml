@@ -14,7 +14,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <main.class>org.example.Main</main.class>
         <app.name>InstallerApp</app.name>
-        <app.version>1.0.2</app.version>
+        <app.version>1.0.3</app.version>
     </properties>
 
     <build>

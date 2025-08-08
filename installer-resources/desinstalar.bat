@@ -18,7 +18,7 @@ if %errorLevel% neq 0 (
 )
 
 echo ======================================================
-echo   InstallerApp v1.0.2-v6 - Desinstalador
+echo   InstallerApp v1.0.3-v7 - Desinstalador
 echo   URL GitHub: abrahan-romo/installer-app
 echo ======================================================
 echo.
