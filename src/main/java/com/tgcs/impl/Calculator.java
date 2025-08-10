@@ -49,5 +49,18 @@ public class Calculator {
         }
         return a / b;
     }
+    /**
+     * Calcula la raíz cuadrada entera de un número.
+     *
+     * @param a el número del que se desea obtener la raíz cuadrada
+     * @return la raíz cuadrada entera de a
+     * @throws IllegalArgumentException si a es negativo
+     */
+    public int raizCuadrada(int a) {
+        if (a < 0) {
+            throw new IllegalArgumentException("No se puede calcular la raíz cuadrada de un número negativo");
+        }
+        return (int) Math.sqrt(a);
+    }
     
 }

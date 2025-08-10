@@ -28,7 +28,7 @@ public class UpdateChecker {
     // Configuración del sistema de updates
     private static final String GITHUB_API_URL = "https://api.github.com/repos/abrahan-romo/installer-app/releases/latest";
     private static final String USER_AGENT = "InstallerApp-Updater/1.0";
-    private static final String CURRENT_VERSION = "1.0.4-v8"; // Updated to match current version
+    private static final String CURRENT_VERSION = "1.0.5-v9"; // Updated to match current version
     private static final int CONNECTION_TIMEOUT_MS = 10000;
     private static final int READ_TIMEOUT_MS = 30000;
     private static final long CHECK_INTERVAL_HOURS = 24;
@@ -442,13 +442,18 @@ public class UpdateChecker {
             
             String currentJarPath = getCurrentJarPath();
             String backupJarPath = currentJarPath + ".backup";
+            String installDir = new File(currentJarPath).getParent();
             
             System.out.println("[UpdateChecker] Preparando instalación...");
             System.out.println("[UpdateChecker] JAR actual: " + currentJarPath);
             System.out.println("[UpdateChecker] JAR descargado: " + downloadedFile.toString());
             System.out.println("[UpdateChecker] Backup: " + backupJarPath);
             
+            // Crear e inicializar el script
             StringBuilder script = new StringBuilder();
+            script.append("@echo off\n");
+            script.append("set \"INSTALL_DIR=").append(installDir).append("\"\n\n");
+            
             script.append("@echo off\n");
             // Request admin privileges using PowerShell
             script.append("powershell -Command \"Start-Process -FilePath '%~f0' -Verb RunAs -ArgumentList 'ELEVATED' & exit\"\n");
@@ -482,6 +487,10 @@ public class UpdateChecker {
             script.append("    exit /b 1\n");
             script.append(")\n");
             script.append("\n");
+            script.append("\n");
+            script.append("REM Determinar la ruta del nuevo JAR\n");
+            script.append("set \"NEW_JAR=%INSTALL_DIR%\\InstallerApp-").append(updateInfo.version).append(".jar\"\n");
+            script.append("\n");
             script.append("REM Crear backup de la versión actual\n");
             script.append("echo Creando respaldo de version actual...\n");
             script.append("copy \"").append(currentJarPath).append("\" \"").append(backupJarPath).append("\"\n");
@@ -494,6 +503,18 @@ public class UpdateChecker {
             script.append("echo Backup creado exitosamente.\n");
             script.append("echo.\n");
             script.append("\n");
+            script.append("\n");
+            script.append("REM Renombrar JAR actual si existe\n");
+            script.append("if exist \"").append(currentJarPath).append("\" (\n");
+            script.append("    echo Preparando para nueva version...\n");
+            script.append("    ren \"").append(currentJarPath).append("\" \"InstallerApp-").append(updateInfo.version).append(".jar\" >nul 2>&1\n");
+            script.append("    if errorlevel 1 (\n");
+            script.append("        echo ERROR: No se pudo renombrar el archivo actual\n");
+            script.append("        echo.\n");
+            script.append("        pause\n");
+            script.append("        exit /b 1\n");
+            script.append("    )\n");
+            script.append(")\n");
             script.append("REM Verificar que el archivo descargado existe\n");
             script.append("if not exist \"").append(downloadedFile.toString()).append("\" (\n");
             script.append("    echo ERROR: No se encontro el archivo descargado en:\n");
@@ -542,6 +563,30 @@ public class UpdateChecker {
             script.append("echo Nueva version instalada exitosamente!\n");
             script.append("echo.\n");
             script.append("\n");
+            script.append("\n");
+            script.append("REM Actualizar run-app.bat\n");
+            script.append("echo @echo off > \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo REM Script para ejecutar la aplicacion Java >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo. >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo REM Cambiar al directorio de la aplicacion >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo cd /d \"%%~dp0\" >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo. >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo REM Verificar que Java este instalado >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo java -version ^>nul 2^>^&1 >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo if %%errorlevel%% neq 0 ( >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo     echo Error: Java no esta instalado en este sistema. >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo     echo Por favor, instala Java desde https://adoptium.net/ >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo     echo. >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo     pause >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo     exit /b 1 >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo ) >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo. >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo REM Ejecutar la aplicacion >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo echo Iniciando InstallerApp ").append(updateInfo.version).append("... >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo java -jar \"InstallerApp-").append(updateInfo.version).append(".jar\" >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo. >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo echo Aplicacion terminada. Presiona cualquier tecla para cerrar... >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo pause ^>nul >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("REM Limpiar backup\n");
             script.append("del \"").append(backupJarPath).append("\" >nul 2>&1\n");
             script.append("\n");
@@ -583,41 +628,31 @@ public class UpdateChecker {
      */
     private String getCurrentJarPath() {
         try {
-            // Intentar obtener el path del JAR actual
-            String jarPath = UpdateChecker.class.getProtectionDomain().getCodeSource().getLocation().getPath();
-            
-            // Decodificar URL encoding si existe
-            jarPath = java.net.URLDecoder.decode(jarPath, "UTF-8");
-            
-            // En Windows, remover el primer "/" si existe
-            if (System.getProperty("os.name").toLowerCase().contains("windows") && jarPath.startsWith("/")) {
-                jarPath = jarPath.substring(1);
-            }
-            
-            // Convertir separadores a Windows si es necesario
-            jarPath = jarPath.replace("/", "\\");
-            
-            System.out.println("[UpdateChecker] JAR Path detectado: " + jarPath);
-            
-            if (jarPath.endsWith(".jar")) {
-                return jarPath;
-            }
-            
-            // Fallback: buscar en el directorio actual
+            //buscar en el directorio actual primero
             File currentDir = new File(System.getProperty("user.dir"));
             File[] jarFiles = currentDir.listFiles((dir, name) -> name.startsWith("InstallerApp") && name.endsWith(".jar"));
-            
+
             if (jarFiles != null && jarFiles.length > 0) {
                 String detectedPath = jarFiles[0].getAbsolutePath();
                 System.out.println("[UpdateChecker] JAR encontrado en directorio actual: " + detectedPath);
                 return detectedPath;
             }
-            
-            // Segundo fallback: asumir instalación estándar en TGCS
+
+            // Buscar en el directorio de instalación
+            String installDir = "C:\\Program Files\\InstallerApp\\TGCS";
+            File[] installJarFiles = new File(installDir).listFiles((dir, name) -> name.startsWith("InstallerApp") && name.endsWith(".jar"));
+
+            if (installJarFiles != null && installJarFiles.length > 0) {
+                String detectedPath = installJarFiles[0].getAbsolutePath();
+                System.out.println("[UpdateChecker] JAR encontrado en directorio de instalación: " + detectedPath);
+                return detectedPath;
+            }
+
+            //Si no se encuentra, usar el path estándar con la versión actual
             String standardPath = "C:\\Program Files\\InstallerApp\\TGCS\\InstallerApp-" + CURRENT_VERSION + ".jar";
             System.out.println("[UpdateChecker] Usando path estándar: " + standardPath);
             return standardPath;
-            
+
         } catch (Exception e) {
             System.err.println("[UpdateChecker] Error obteniendo JAR path: " + e.getMessage());
             String fallbackPath = "C:\\Program Files\\InstallerApp\\TGCS\\InstallerApp-" + CURRENT_VERSION + ".jar";
@@ -625,7 +660,7 @@ public class UpdateChecker {
             return fallbackPath;
         }
     }
-    
+
     /**
      * Mostrar dialog de instalación lista
      */

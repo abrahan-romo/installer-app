@@ -15,8 +15,8 @@ if %errorlevel% neq 0 (
 )
 
 REM Ejecutar la aplicacion
-echo Iniciando InstallerApp v1.0.4-v8...
-java -jar "InstallerApp-1.0.4-v8.jar"
+echo Iniciando InstallerApp v1.0.5-v9...
+java -jar "InstallerApp-1.0.5-v9.jar"
 
 echo.
 echo Aplicacion terminada. Presiona cualquier tecla para cerrar...
