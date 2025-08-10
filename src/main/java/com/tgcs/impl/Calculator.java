@@ -62,5 +62,14 @@ public class Calculator {
         }
         return (int) Math.sqrt(a);
     }
+
+    /**
+     * Multiplica el parámetro por 2 y retorna el resultado.
+     * @param a el número a multiplicar
+     * @return el resultado de a * 2
+     */
+    public int multiplicarPorDos(int a) {
+        return a * 2;
+    }
     
 }
