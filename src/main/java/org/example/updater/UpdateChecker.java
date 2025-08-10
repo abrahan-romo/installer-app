@@ -453,10 +453,10 @@ public class UpdateChecker {
             StringBuilder script = new StringBuilder();
             script.append("@echo off\n");
             script.append("set \"INSTALL_DIR=").append(installDir).append("\"\n\n");
-            
+
             script.append("@echo off\n");
-            // Request admin privileges using PowerShell
-            script.append("powershell -Command \"Start-Process -FilePath '%~f0' -Verb RunAs -ArgumentList 'ELEVATED' & exit\"\n");
+            // Request admin privileges using PowerShell (corrigiendo el uso de &)
+            script.append("powershell -Command \"Start-Process -FilePath '%~f0' -Verb RunAs -ArgumentList 'ELEVATED' '&' exit\"\n");
             script.append("if '%1'=='ELEVATED' goto :continue\n");
             script.append("exit /b\n\n");
             script.append(":continue\n");
