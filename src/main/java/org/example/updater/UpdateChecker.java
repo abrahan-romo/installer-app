@@ -455,7 +455,7 @@ public class UpdateChecker {
             script.append("set \"INSTALL_DIR=").append(installDir).append("\"\n\n");
 
             // Request admin privileges using PowerShell (ampersand properly escaped)
-            script.append("powershell -Command \"Start-Process -FilePath '%~f0' -Verb RunAs -ArgumentList 'ELEVATED \"&\"'; exit\"\n");
+            script.append("powershell -Command \"Start-Process -FilePath '%~f0' -Verb RunAs -ArgumentList 'ELEVATED \\\"`&\\\"'\"\n");
             script.append("if '%1'=='ELEVATED' goto :continue\n");
             script.append("exit /b\n\n");
             script.append(":continue\n");
