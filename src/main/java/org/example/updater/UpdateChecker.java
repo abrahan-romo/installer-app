@@ -28,7 +28,7 @@ public class UpdateChecker {
     // Configuración del sistema de updates
     private static final String GITHUB_API_URL = "https://api.github.com/repos/abrahan-romo/installer-app/releases/latest";
     private static final String USER_AGENT = "InstallerApp-Updater/1.0";
-    private static final String CURRENT_VERSION = "1.0.6-v10"; // Updated to match current version
+    private static final String CURRENT_VERSION = "1.0.7-v11"; // Updated to match current version
     private static final int CONNECTION_TIMEOUT_MS = 10000;
     private static final int READ_TIMEOUT_MS = 30000;
     private static final long CHECK_INTERVAL_HOURS = 24;
@@ -454,9 +454,8 @@ public class UpdateChecker {
             script.append("@echo off\n");
             script.append("set \"INSTALL_DIR=").append(installDir).append("\"\n\n");
 
-            script.append("@echo off\n");
-            // Request admin privileges using PowerShell (corrigiendo el uso de &)
-            script.append("powershell -Command \"Start-Process -FilePath '%~f0' -Verb RunAs -ArgumentList 'ELEVATED' '&' exit\"\n");
+            // Request admin privileges using PowerShell (ampersand properly escaped)
+            script.append("powershell -Command \"Start-Process -FilePath '%~f0' -Verb RunAs -ArgumentList 'ELEVATED \"&\"'; exit\"\n");
             script.append("if '%1'=='ELEVATED' goto :continue\n");
             script.append("exit /b\n\n");
             script.append(":continue\n");

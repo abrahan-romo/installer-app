@@ -71,5 +71,14 @@ public class Calculator {
     public int multiplicarPorDos(int a) {
         return a * 2;
     }
+
+    /**
+     * Multiplica el parámetro por 3 y retorna el resultado.
+     * @param a el número a multiplicar
+     * @return el resultado de a * 3
+     */
+    public int multiplicarPorTres(int a) {
+        return a * 3;
+    }
     
 }
