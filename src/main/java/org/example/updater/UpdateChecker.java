@@ -607,7 +607,7 @@ public class UpdateChecker {
             script.append("del \"").append(scriptPath.toString()).append("\" >nul 2>&1\n");
             script.append("\n");
             script.append("echo Proceso completado. Cerrando...\n");
-            script.append("exit\n");
+            script.append("exit /b\n");
             
             Files.write(scriptPath, script.toString().getBytes());
             
