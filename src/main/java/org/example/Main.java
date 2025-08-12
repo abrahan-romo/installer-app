@@ -12,7 +12,7 @@ public class Main {
     private static UpdateChecker updateChecker;
     
     public static void main(String[] args) {
-        System.out.println("¡Bienvenido a InstallerApp v1.0.7-v11!");
+        System.out.println("¡Bienvenido a InstallerApp v1.0.8-v12!");
         System.out.println("==================================================");
         
         // Crear la ventana principal de la aplicación
@@ -23,7 +23,7 @@ public class Main {
      * Crear y mostrar la interfaz gráfica principal
      */
     private static void createAndShowGUI() {
-        JFrame frame = new JFrame("InstallerApp v1.0.7-v11 - Calculadora");
+        JFrame frame = new JFrame("InstallerApp v1.0.8-v12 - Calculadora");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 400);
         frame.setLocationRelativeTo(null);
@@ -118,7 +118,7 @@ public class Main {
         // Panel de información
         JLabel infoLabel = new JLabel(
             "<html><center>" +
-            "InstallerApp v1.0.7-v11 con Sistema de Actualizaciones Automáticas<br/>" +
+            "InstallerApp v1.0.8-v12 con Sistema de Actualizaciones Automáticas<br/>" +
             "La aplicación verificará automáticamente nuevas versiones cada 24 horas" +
             "</center></html>", 
             JLabel.CENTER
@@ -160,7 +160,7 @@ public class Main {
      */
     private static void showDemoPopup(JFrame parentFrame) {
         String demoMessage = 
-            "=== DEMO - InstallerApp v1.0.7-v11 ===\n\n" +
+            "=== DEMO - InstallerApp v1.0.8-v12 ===\n\n" +
             "✅ MÉTODOS DISPONIBLES EN CALCULATOR.JAVA:\n\n" +
             "🔢 OPERACIONES BÁSICAS:\n" +
             "• sum(int a, int b) - Suma de dos números\n" +
@@ -171,8 +171,9 @@ public class Main {
             "• raizCuadrada(int a) - Raíz cuadrada entera\n\n" +
             "🔢 MULTIPLICACIONES ESPECIALES:\n" +
             "• multiplicarPorDos(int a) - Multiplica por 2\n" +
-            "• multiplicarPorTres(int a) - Multiplica por 3\n\n" +
-            "📊 TOTAL: 7 métodos implementados\n\n" +
+            "• multiplicarPorTres(int a) - Multiplica por 3\n" +
+            "• multiplicaPorCuatro(int a) - Multiplica por 4\n\n" +
+            "📊 TOTAL: 8 métodos implementados\n\n" +
             "Esta versión incluye mejoras en el sistema de actualizaciones\n" +
             "y correcciones de PowerShell para Windows.";
 
@@ -187,7 +188,7 @@ public class Main {
         JOptionPane.showMessageDialog(
             parentFrame,
             scrollPane,
-            "DEMO - Métodos Calculator v1.0.7-v11",
+            "DEMO - Métodos Calculator v1.0.8-v12",
             JOptionPane.INFORMATION_MESSAGE
         );
     }
@@ -198,7 +199,7 @@ public class Main {
     private static void runCalculatorDemo(JTextArea demoArea) {
         Calculator calculator = new Calculator();
         
-        demoArea.append("=== Demostración de InstallerApp v1.0.7-v11 ===\n");
+        demoArea.append("=== Demostración de InstallerApp v1.0.8-v12 ===\n");
         demoArea.append("TODOS LOS MÉTODOS IMPLEMENTADOS:\n\n");
         
         // Demostración de suma
@@ -232,11 +233,12 @@ public class Main {
         // Demostración de multiplicaciones especiales
         demoArea.append("🔢 MULTIPLICACIONES ESPECIALES:\n");
         demoArea.append("  multiplicarPorDos(7) = " + calculator.multiplicarPorDos(7) + "\n");
-        demoArea.append("  multiplicarPorTres(5) = " + calculator.multiplicarPorTres(5) + "\n\n");
+        demoArea.append("  multiplicarPorTres(5) = " + calculator.multiplicarPorTres(5) + "\n");
+        demoArea.append("  multiplicaPorCuatro(6) = " + calculator.multiplicaPorCuatro(6) + "\n\n");
         
         demoArea.append("=== Demostración completada ===\n");
         demoArea.append("Pruebe la calculadora usando los campos de arriba.\n");
-        demoArea.append("Esta versión incluye 7 métodos implementados.\n\n");
+        demoArea.append("Esta versión incluye 8 métodos implementados.\n\n");
     }
     
     /**

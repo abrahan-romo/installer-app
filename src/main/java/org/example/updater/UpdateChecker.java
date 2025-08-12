@@ -28,7 +28,7 @@ public class UpdateChecker {
     // Configuración del sistema de updates
     private static final String GITHUB_API_URL = "https://api.github.com/repos/abrahan-romo/installer-app/releases/latest";
     private static final String USER_AGENT = "InstallerApp-Updater/1.0";
-    private static final String CURRENT_VERSION = "1.0.7-v11"; // Updated to match current version
+    private static final String CURRENT_VERSION = "1.0.8-v12"; // Updated to match current version
     private static final int CONNECTION_TIMEOUT_MS = 10000;
     private static final int READ_TIMEOUT_MS = 30000;
     private static final long CHECK_INTERVAL_HOURS = 24;
