@@ -454,8 +454,8 @@ public class UpdateChecker {
             script.append("@echo off\n");
             script.append("set \"INSTALL_DIR=").append(installDir).append("\"\n\n");
 
-            // Request admin privileges using PowerShell (simplified without ampersand)
-            script.append("powershell -Command \"Start-Process -FilePath '%~f0' -Verb RunAs -ArgumentList 'ELEVATED'\"\n");
+            // Request admin privileges using PowerShell (with escaped quotes)
+            script.append("powershell -Command \"Start-Process -FilePath \\\"%%~f0\\\" -Verb RunAs -ArgumentList \\\"ELEVATED\\\"\"\n");
             script.append("if '%1'=='ELEVATED' goto :continue\n");
             script.append("exit /b\n\n");
             script.append(":continue\n");
@@ -577,7 +577,7 @@ public class UpdateChecker {
             script.append("echo     echo Por favor, instala Java desde https://adoptium.net/ >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("echo     echo. >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("echo     pause >> \"%INSTALL_DIR%\\run-app.bat\"\n");
-            script.append("echo     exit /b 1 >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo     call exit /b 1 >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("echo ) >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("echo. >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("echo REM Ejecutar la aplicacion >> \"%INSTALL_DIR%\\run-app.bat\"\n");
