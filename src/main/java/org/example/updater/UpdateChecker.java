@@ -463,7 +463,7 @@ public class UpdateChecker {
             script.append("title InstallerApp - Actualizacion a ").append(updateInfo.version).append("\n");
             script.append("color 0A\n");
             script.append("echo ========================================\n");
-            script.append("echo    InstallerApp - Sistema de Actualizacion\n");
+            script.append("echo    InstallerApp - Sistema de Actualizacion de Calculator.java\n");
             script.append("echo ========================================\n");
             script.append("echo.\n");
             script.append("echo Instalando version ").append(updateInfo.version).append("...\n");
