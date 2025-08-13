@@ -1,3 +1,31 @@
+/*
+ * ARCHIVO DE RESPALDO - UpdateChecker.java
+ * 
+ * Fecha de respaldo: 13 de agosto de 2025
+ * Versión del proyecto: 1.0.9-v13
+ * Commit: 7cea953 (feat: Actualizar a versión 1.0.9-v13 con método multiplicarPorCinco)
+ * Tag: v1.0.9
+ * 
+ * Propósito del respaldo: Se solicitará cambios en UpdateChecker.java para corregir un error.
+ * Este archivo contiene la versión estable antes de las modificaciones.
+ * 
+ * Estado: FUNCIONAL - Sistema de actualizaciones operativo
+ * 
+ * Características principales:
+ * - Verificación automática de actualizaciones desde GitHub API
+ * - Sistema de elevación de privilegios corregido (sin bucle infinito)
+ * - Descarga e instalación automática de updates
+ * - Manejo de archivos temporales
+ * - Interfaz de usuario con progress dialogs
+ * - Validación de archivos descargados
+ * - Scripts de instalación automatizados
+ * 
+ * Versión actual configurada: 1.0.9-v13
+ * GitHub API: https://api.github.com/repos/abrahan-romo/installer-app/releases/latest
+ * 
+ * ========================================================================
+ */
+
 package org.example.updater;
 
 import javax.swing.*;
@@ -227,15 +255,6 @@ public class UpdateChecker {
             // Extraer nombre del archivo
             if (info.downloadUrl != null) {
                 info.fileName = info.downloadUrl.substring(info.downloadUrl.lastIndexOf("/") + 1);
-                
-                // Extraer la versión completa del nombre del archivo para consistencia
-                // Ejemplo: InstallerApp-1.0.9-v13.jar -> 1.0.9-v13
-                if (info.fileName.startsWith("InstallerApp-") && info.fileName.endsWith(".jar")) {
-                    String versionFromFilename = info.fileName.substring(13, info.fileName.length() - 4);
-                    if (!versionFromFilename.isEmpty()) {
-                        info.version = versionFromFilename; // Usar versión del filename para consistencia
-                    }
-                }
             }
             
             System.out.println("[UpdateChecker] Parsed: version=" + info.version + ", downloadUrl=" + info.downloadUrl);
@@ -519,6 +538,17 @@ public class UpdateChecker {
             script.append("echo.\n");
             script.append("\n");
             script.append("\n");
+            script.append("REM Renombrar JAR actual si existe\n");
+            script.append("if exist \"").append(currentJarPath).append("\" (\n");
+            script.append("    echo Preparando para nueva version...\n");
+            script.append("    ren \"").append(currentJarPath).append("\" \"InstallerApp-").append(updateInfo.version).append(".jar\" >nul 2>&1\n");
+            script.append("    if errorlevel 1 (\n");
+            script.append("        echo ERROR: No se pudo renombrar el archivo actual\n");
+            script.append("        echo.\n");
+            script.append("        pause\n");
+            script.append("        exit /b 1\n");
+            script.append("    )\n");
+            script.append(")\n");
             script.append("REM Verificar que el archivo descargado existe\n");
             script.append("if not exist \"").append(downloadedFile.toString()).append("\" (\n");
             script.append("    echo ERROR: No se encontro el archivo descargado en:\n");
@@ -528,21 +558,22 @@ public class UpdateChecker {
             script.append("    exit /b 1\n");
             script.append(")\n");
             script.append("\n");
-            script.append("REM Preparar instalacion - limpiar versiones anteriores\n");
+            script.append("REM Verificar si el archivo destino existe y eliminarlo\n");
             script.append("echo Preparando instalacion de nueva version...\n");
-            script.append("echo Limpiando versiones anteriores...\n");
-            script.append("for %%f in (\"%INSTALL_DIR%\\InstallerApp-*.jar\") do (\n");
-            script.append("    if exist \"%%f\" (\n");
-            script.append("        echo Eliminando %%f\n");
-            script.append("        del /F /Q \"%%f\"\n");
+            script.append("if exist \"").append(currentJarPath).append("\" (\n");
+            script.append("    del /F /Q \"").append(currentJarPath).append("\"\n");
+            script.append("    if errorlevel 1 (\n");
+            script.append("        echo ERROR: No se pudo eliminar la version anterior\n");
+            script.append("        echo Es posible que necesite permisos de administrador\n");
+            script.append("        echo.\n");
+            script.append("        pause\n");
+            script.append("        exit /b 1\n");
             script.append("    )\n");
-            script.append(")\n");
-            script.append("echo Limpieza completada.\n");
-            script.append("echo.\n\n");
+            script.append(")\n\n");
             
-            script.append("REM Instalar nueva versión con nombre correcto\n");
+            script.append("REM Instalar nueva versión\n");
             script.append("echo Instalando nueva version...\n");
-            script.append("copy /B /Y \"").append(downloadedFile.toString()).append("\" \"").append(installDir).append("\\").append(updateInfo.fileName).append("\"\n");
+            script.append("copy /B /Y \"").append(downloadedFile.toString()).append("\" \"").append(currentJarPath).append("\"\n");
             script.append("if errorlevel 1 (\n");
             script.append("    echo ERROR: No se pudo instalar nueva version\n");
             script.append("    echo Restaurando backup...\n");
@@ -554,7 +585,7 @@ public class UpdateChecker {
             
             script.append("REM Verificar integridad del archivo copiado\n");
             script.append("echo Verificando instalacion...\n");
-            script.append("fc /b \"").append(downloadedFile.toString()).append("\" \"").append(installDir).append("\\").append(updateInfo.fileName).append("\" >nul\n");
+            script.append("fc /b \"").append(downloadedFile.toString()).append("\" \"").append(currentJarPath).append("\" >nul\n");
             script.append("if errorlevel 1 (\n");
             script.append("    echo ERROR: La verificacion de archivos fallo\n");
             script.append("    echo Restaurando backup...\n");
@@ -586,7 +617,7 @@ public class UpdateChecker {
             script.append("echo. >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("echo REM Ejecutar la aplicacion >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("echo echo Iniciando InstallerApp ").append(updateInfo.version).append("... >> \"%INSTALL_DIR%\\run-app.bat\"\n");
-            script.append("echo java -jar \"").append(updateInfo.fileName).append("\" >> \"%INSTALL_DIR%\\run-app.bat\"\n");
+            script.append("echo java -jar \"InstallerApp-").append(updateInfo.version).append(".jar\" >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("echo. >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("echo echo Aplicacion terminada. Presiona cualquier tecla para cerrar... >> \"%INSTALL_DIR%\\run-app.bat\"\n");
             script.append("echo pause ^>nul >> \"%INSTALL_DIR%\\run-app.bat\"\n");
@@ -602,7 +633,7 @@ public class UpdateChecker {
             script.append("timeout /t 3 /nobreak\n");
             script.append("\n");
             script.append("REM Reiniciar aplicación\n");
-            script.append("start \"InstallerApp\" java -jar \"").append(installDir).append("\\").append(updateInfo.fileName).append("\"\n");
+            script.append("start \"InstallerApp\" java -jar \"").append(currentJarPath).append("\"\n");
             script.append("\n");
             script.append("REM Limpiar archivos temporales\n");
             script.append("echo Limpiando archivos temporales...\n");
@@ -734,7 +765,7 @@ public class UpdateChecker {
             
             System.out.println("[UpdateChecker] Comando a ejecutar: " + String.join(" ", pb.command()));
             
-            pb.start();
+            Process process = pb.start();
             
             System.out.println("[UpdateChecker] Proceso de instalación iniciado.");
             System.out.println("[UpdateChecker] La aplicación se cerrará en 2 segundos...");
