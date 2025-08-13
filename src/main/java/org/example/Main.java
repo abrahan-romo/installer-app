@@ -12,7 +12,7 @@ public class Main {
     private static UpdateChecker updateChecker;
     
     public static void main(String[] args) {
-        System.out.println("¡Bienvenido a InstallerApp v1.0.9-v13!");
+        System.out.println("¡Bienvenido a InstallerApp v1.0.10-v14!");
         System.out.println("==================================================");
         
         // Crear la ventana principal de la aplicación
@@ -23,7 +23,7 @@ public class Main {
      * Crear y mostrar la interfaz gráfica principal
      */
     private static void createAndShowGUI() {
-        JFrame frame = new JFrame("InstallerApp v1.0.9-v13 - Calculadora");
+        JFrame frame = new JFrame("InstallerApp v1.0.10-v14 - Calculadora");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setSize(500, 400);
         frame.setLocationRelativeTo(null);
@@ -118,7 +118,7 @@ public class Main {
         // Panel de información
         JLabel infoLabel = new JLabel(
             "<html><center>" +
-            "InstallerApp v1.0.9-v13 con Sistema de Actualizaciones Automáticas<br/>" +
+            "InstallerApp v1.0.10-v14 con Sistema de Actualizaciones Automáticas<br/>" +
             "La aplicación verificará automáticamente nuevas versiones cada 24 horas" +
             "</center></html>", 
             JLabel.CENTER
@@ -160,7 +160,7 @@ public class Main {
      */
     private static void showDemoPopup(JFrame parentFrame) {
         String demoMessage = 
-            "=== DEMO - InstallerApp v1.0.9-v13 ===\n\n" +
+            "=== DEMO - InstallerApp v1.0.10-v14 ===\n\n" +
             "✅ MÉTODOS DISPONIBLES EN CALCULATOR.JAVA:\n\n" +
             "🔢 OPERACIONES BÁSICAS:\n" +
             "• sum(int a, int b) - Suma de dos números\n" +
@@ -173,8 +173,9 @@ public class Main {
             "• multiplicarPorDos(int a) - Multiplica por 2\n" +
             "• multiplicarPorTres(int a) - Multiplica por 3\n" +
             "• multiplicaPorCuatro(int a) - Multiplica por 4\n" +
-            "• multiplicarPorCinco(int a) - Multiplica por 5\n\n" +
-            "📊 TOTAL: 9 métodos implementados\n\n" +
+            "• multiplicarPorCinco(int a) - Multiplica por 5\n" +
+            "• multiplicarPorSeis(int a) - Multiplica por 6\n\n" +
+            "📊 TOTAL: 10 métodos implementados\n\n" +
             "Esta versión incluye mejoras en el sistema de actualizaciones\n" +
             "y correcciones de PowerShell para Windows.";
 
@@ -189,7 +190,7 @@ public class Main {
         JOptionPane.showMessageDialog(
             parentFrame,
             scrollPane,
-            "DEMO - Métodos Calculator v1.0.9-v13",
+            "DEMO - Métodos Calculator v1.0.10-v14",
             JOptionPane.INFORMATION_MESSAGE
         );
     }
@@ -200,7 +201,7 @@ public class Main {
     private static void runCalculatorDemo(JTextArea demoArea) {
         Calculator calculator = new Calculator();
         
-        demoArea.append("=== Demostración de InstallerApp v1.0.9-v13 ===\n");
+        demoArea.append("=== Demostración de InstallerApp v1.0.10-v14 ===\n");
         demoArea.append("TODOS LOS MÉTODOS IMPLEMENTADOS:\n\n");
         
         // Demostración de suma
@@ -236,11 +237,12 @@ public class Main {
         demoArea.append("  multiplicarPorDos(7) = " + calculator.multiplicarPorDos(7) + "\n");
         demoArea.append("  multiplicarPorTres(5) = " + calculator.multiplicarPorTres(5) + "\n");
         demoArea.append("  multiplicaPorCuatro(6) = " + calculator.multiplicaPorCuatro(6) + "\n");
-        demoArea.append("  multiplicarPorCinco(4) = " + calculator.multiplicarPorCinco(4) + "\n\n");
+        demoArea.append("  multiplicarPorCinco(4) = " + calculator.multiplicarPorCinco(4) + "\n");
+        demoArea.append("  multiplicarPorSeis(3) = " + calculator.multiplicarPorSeis(3) + "\n\n");
         
         demoArea.append("=== Demostración completada ===\n");
         demoArea.append("Pruebe la calculadora usando los campos de arriba.\n");
-        demoArea.append("Esta versión incluye 9 métodos implementados.\n\n");
+        demoArea.append("Esta versión incluye 10 métodos implementados.\n\n");
     }
     
     /**

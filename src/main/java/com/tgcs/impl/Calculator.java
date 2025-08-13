@@ -98,5 +98,14 @@ public class Calculator {
     public int multiplicarPorCinco(int a) {
         return a * 5;
     }
+
+    /**
+     * Multiplica el parámetro por 6 y retorna el resultado.
+     * @param a el número a multiplicar
+     * @return el resultado de a * 6
+     */
+    public int multiplicarPorSeis(int a) {
+        return a * 6;
+    }
     
 }
