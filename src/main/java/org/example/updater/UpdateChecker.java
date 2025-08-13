@@ -454,7 +454,7 @@ public class UpdateChecker {
             script.append("@echo off\n");
             script.append("set \"INSTALL_DIR=").append(installDir).append("\"\n\n");
 
-            script.append("echo Verificando permisos de administrador...\n");
+            script.append("echo Verificando permisos de administrador sin bucle ...\n");
             // Check if already running as administrator
             script.append("net session >nul 2>&1\n");
             script.append("if %errorlevel% == 0 (\n");
