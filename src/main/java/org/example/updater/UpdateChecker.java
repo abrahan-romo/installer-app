@@ -229,7 +229,7 @@ public class UpdateChecker {
                 info.fileName = info.downloadUrl.substring(info.downloadUrl.lastIndexOf("/") + 1);
                 
                 // Extraer la versión completa del nombre del archivo para consistencia
-                // Ejemplo: InstallerApp-1.0.9-v13.jar -> 1.0.9-v13
+                // Ejemplo: InstallerApp-1.0.10-v14.jar -> 1.0.10-v14
                 if (info.fileName.startsWith("InstallerApp-") && info.fileName.endsWith(".jar")) {
                     String versionFromFilename = info.fileName.substring(13, info.fileName.length() - 4);
                     if (!versionFromFilename.isEmpty()) {

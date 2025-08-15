@@ -18,7 +18,7 @@ if %errorLevel% neq 0 (
 )
 
 echo ======================================================
-echo   InstallerApp v1.0.9-v13 - Instalador FINAL
+echo   InstallerApp v1.0.10-v14 - Instalador FINAL
 echo   URL GitHub: abrahan-romo/installer-app
 echo   Instalacion en: C:\Program Files\InstallerApp\TGCS
 echo ======================================================
@@ -42,18 +42,18 @@ set "SCRIPT_DIR=%~dp0"
 
 REM Copiar archivos con verificacion y ruta absoluta
 echo Copiando archivos...
-if not exist "%SCRIPT_DIR%InstallerApp-1.0.9-v13.jar" (
-    echo ERROR: No se encontro InstallerApp-1.0.9-v13.jar en %SCRIPT_DIR%
+if not exist "%SCRIPT_DIR%InstallerApp-1.0.10-v14.jar" (
+    echo ERROR: No se encontro InstallerApp-1.0.10-v14.jar en %SCRIPT_DIR%
     echo Archivos disponibles:
     dir "%SCRIPT_DIR%*.jar" 2>nul
     pause
     exit /b 1
 )
 
-copy "%SCRIPT_DIR%InstallerApp-1.0.9-v13.jar" "%INSTALL_DIR%\" >nul 2>&1
+copy "%SCRIPT_DIR%InstallerApp-1.0.10-v14.jar" "%INSTALL_DIR%\" >nul 2>&1
 if errorlevel 1 (
-    echo ERROR: No se pudo copiar InstallerApp-1.0.9-v13.jar
-    echo Origen: %SCRIPT_DIR%InstallerApp-1.0.9-v13.jar
+    echo ERROR: No se pudo copiar InstallerApp-1.0.10-v14.jar
+    echo Origen: %SCRIPT_DIR%InstallerApp-1.0.10-v14.jar
     echo Destino: %INSTALL_DIR%\
     pause
     exit /b 1
@@ -76,6 +76,6 @@ echo Ubicacion: %INSTALL_DIR%
 echo URL del repositorio: https://github.com/abrahan-romo/installer-app
 echo Sistema de actualizaciones: CONFIGURADO
 echo.
-echo Para ejecutar: java -jar "%INSTALL_DIR%\InstallerApp-1.0.9-v13.jar"
+echo Para ejecutar: java -jar "%INSTALL_DIR%\InstallerApp-1.0.10-v14.jar"
 echo.
 pause
